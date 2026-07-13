@@ -256,6 +256,45 @@
   }
   .opts.row .opt { flex: 1 1 160px; }
 
+  /* ---------- Карточка «О лекции» (только чтение) ---------- */
+  .facts { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .fact {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .fact dt {
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .fact dd {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  @media (max-width: 520px) {
+    .fact { grid-template-columns: 1fr; gap: 2px; }
+  }
+
+  /* ---------- Генератор ссылки (?setup) ---------- */
+  .setup { display: none; flex-direction: column; gap: 20px; }
+  .setup.show { display: flex; }
+  .link-out {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    word-break: break-all;
+    background: var(--field);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 12px 13px;
+    color: var(--blue);
+  }
   /* ---------- Блок вопросов (акцент) ---------- */
   section.block.questions {
     border-left: 4px solid var(--lime);
@@ -366,33 +405,58 @@
     </div>
   </header>
 
+  <!-- Панель организатора: открывается по адресу ...?setup — слушателям не видна -->
+  <section class="block setup" id="setup">
+    <div class="block-head">
+      <h2>Ссылка для слушателей</h2>
+      <p>Заполните данные лекции — получите готовую ссылку. У слушателей эти поля будут только для чтения.</p>
+    </div>
+    <div class="two">
+      <div class="field">
+        <label for="s-topic">Тема лекции</label>
+        <input type="text" id="s-topic" placeholder="Информационная безопасность" />
+      </div>
+      <div class="field">
+        <label for="s-lecturer">Лектор</label>
+        <input type="text" id="s-lecturer" placeholder="Иванов И. И." />
+      </div>
+    </div>
+    <div class="field">
+      <label for="s-date">Дата лекции</label>
+      <input type="text" id="s-date" placeholder="13.07.2026" />
+    </div>
+    <div class="field">
+      <span class="q">Готовая ссылка</span>
+      <div class="link-out" id="s-link">—</div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn-primary" id="s-copy">Скопировать ссылку</button>
+      <button type="button" class="btn-ghost" id="s-open">Открыть и проверить</button>
+    </div>
+    <div class="status" id="s-status" role="status" aria-live="polite"></div>
+  </section>
+
   <form id="form" novalidate>
 
-    <section class="block">
+    <section class="block lecture-card">
       <div class="block-head">
         <h2>О лекции</h2>
-        <p>Заполняется автоматически, при необходимости поправьте</p>
+        <p>Заполнено организаторами</p>
       </div>
-      <div class="two">
-        <div class="field">
-          <label for="topic">Тема лекции</label>
-          <input type="text" id="topic" name="topic" placeholder="Название лекции" />
+      <dl class="facts">
+        <div class="fact">
+          <dt>Тема</dt>
+          <dd id="fact-topic">—</dd>
         </div>
-        <div class="field">
-          <label for="lecturer">Лектор</label>
-          <input type="text" id="lecturer" name="lecturer" placeholder="ФИО выступающего" />
+        <div class="fact">
+          <dt>Лектор</dt>
+          <dd id="fact-lecturer">—</dd>
         </div>
-      </div>
-      <div class="two">
-        <div class="field">
-          <label for="date">Дата лекции</label>
-          <input type="text" id="date" name="date" placeholder="13.07.2026" />
+        <div class="fact">
+          <dt>Дата</dt>
+          <dd id="fact-date">—</dd>
         </div>
-        <div class="field">
-          <label for="org">Организация / подразделение</label>
-          <input type="text" id="org" name="org" placeholder="Например: отдел ИБ" />
-        </div>
-      </div>
+      </dl>
     </section>
 
     <section class="block">
@@ -482,6 +546,11 @@
         </div>
       </div>
 
+      <div class="field">
+        <label for="org">Организация / подразделение</label>
+        <input type="text" id="org" name="org" placeholder="Например: отдел ИБ" autocomplete="organization" />
+      </div>
+
       <label class="consent">
         <input type="checkbox" id="consent" name="consent" />
         <span>Согласен на обработку указанных данных для подготовки ответов на вопросы и улучшения лекций. Если поля контактов пустые — анкета уходит анонимно.</span>
@@ -518,20 +587,66 @@
   const form = $("form");
   const status = $("status");
 
-  // --- Предзаполнение темы/даты из ссылки: ?topic=...&lecturer=...&date=... ---
+  // --- Данные лекции задаёт организатор в ссылке: ?topic=...&lecturer=...&date=...
+  //     Слушатель их только видит и изменить не может. ---
   const params = new URLSearchParams(location.search);
   const today = new Date().toLocaleDateString("ru-RU");
-  $("topic").value = params.get("topic") || "";
-  $("lecturer").value = params.get("lecturer") || "";
-  $("date").value = params.get("date") || today;
 
-  const syncChips = () => {
-    $("chip-topic").textContent = $("topic").value.trim() || "не указана";
-    $("chip-date").textContent = $("date").value.trim() || "—";
+  const lecture = {
+    topic: (params.get("topic") || "").trim(),
+    lecturer: (params.get("lecturer") || "").trim(),
+    date: (params.get("date") || today).trim(),
   };
-  $("topic").addEventListener("input", syncChips);
-  $("date").addEventListener("input", syncChips);
-  syncChips();
+
+  $("fact-topic").textContent = lecture.topic || "не указана";
+  $("fact-lecturer").textContent = lecture.lecturer || "не указан";
+  $("fact-date").textContent = lecture.date;
+  $("chip-topic").textContent = lecture.topic || "не указана";
+  $("chip-date").textContent = lecture.date;
+
+  // --- Панель организатора: ...?setup ---
+  if (params.has("setup")) {
+    $("setup").classList.add("show");
+
+    const base = location.origin + location.pathname;
+    const buildLink = () => {
+      const q = new URLSearchParams();
+      const t = $("s-topic").value.trim();
+      const l = $("s-lecturer").value.trim();
+      const d = $("s-date").value.trim();
+      if (t) q.set("topic", t);
+      if (l) q.set("lecturer", l);
+      if (d) q.set("date", d);
+      const link = q.toString() ? base + "?" + q.toString() : base;
+      $("s-link").textContent = link;
+      return link;
+    };
+
+    $("s-date").value = today;
+    ["s-topic", "s-lecturer", "s-date"].forEach((id) =>
+      $(id).addEventListener("input", buildLink)
+    );
+    buildLink();
+
+    const sSay = (msg, cls) => {
+      $("s-status").textContent = msg;
+      $("s-status").className = "status" + (cls ? " " + cls : "");
+    };
+
+    $("s-copy").addEventListener("click", async () => {
+      const link = buildLink();
+      try {
+        await navigator.clipboard.writeText(link);
+        sSay("Ссылка скопирована — раздайте её слушателям или сверните в QR-код.", "ok");
+      } catch {
+        sSay("Скопируйте ссылку вручную из поля выше.", "err");
+      }
+    });
+
+    $("s-open").addEventListener("click", () => {
+      window.open(buildLink(), "_blank", "noopener");
+    });
+  }
 
   // --- Счётчик вопросов ---
   const qField = $("questions");
@@ -549,9 +664,9 @@
 
   const collect = () => ({
     submittedAt: new Date().toLocaleString("ru-RU"),
-    topic: val("topic"),
-    lecturer: val("lecturer"),
-    date: val("date"),
+    topic: lecture.topic,
+    lecturer: lecture.lecturer,
+    date: lecture.date,
     org: val("org"),
     useful: val("useful"),
     clarity: val("clarity"),
@@ -693,10 +808,6 @@
   $("again").addEventListener("click", () => {
     form.reset();
     $("qcount").textContent = "Вопросов: 0";
-    $("date").value = params.get("date") || today;
-    $("topic").value = params.get("topic") || "";
-    $("lecturer").value = params.get("lecturer") || "";
-    syncChips();
     say("");
     $("done").classList.remove("show");
     form.style.display = "flex";
