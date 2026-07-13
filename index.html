@@ -605,8 +605,16 @@
   $("chip-date").textContent = lecture.date;
 
   // --- Панель организатора: ...?setup ---
+  // Это отдельный режим: анкету при нём не показываем, чтобы не путать
+  // генератор ссылки с самой анкетой.
   if (params.has("setup")) {
     $("setup").classList.add("show");
+    form.style.display = "none";
+    document.querySelector(".masthead h1").textContent = "Ссылка на анкету для слушателей";
+    document.querySelector(".masthead .lede").textContent =
+      "Служебная страница организатора. Заполните данные лекции, скопируйте ссылку и раздайте её слушателям — анкету они увидят уже с проставленными темой, лектором и датой.";
+    document.querySelector(".masthead .eyebrow").lastChild.textContent = " Панель организатора";
+    document.querySelector(".masthead .meta").style.display = "none";
 
     const base = location.origin + location.pathname;
     const buildLink = () => {
@@ -622,7 +630,9 @@
       return link;
     };
 
-    $("s-date").value = today;
+    $("s-topic").value = lecture.topic;
+    $("s-lecturer").value = lecture.lecturer;
+    $("s-date").value = lecture.date || today;
     ["s-topic", "s-lecturer", "s-date"].forEach((id) =>
       $(id).addEventListener("input", buildLink)
     );
