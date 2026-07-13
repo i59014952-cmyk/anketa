@@ -282,8 +282,9 @@
   }
 
   /* ---------- Генератор ссылки (?setup) ---------- */
-  .setup { display: none; flex-direction: column; gap: 20px; }
-  .setup.show { display: flex; }
+  /* Специфичность должна перебивать section.block, иначе панель видна всем */
+  section.block.setup { display: none; }
+  section.block.setup.show { display: flex; }
   .link-out {
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
     font-size: 13px;
