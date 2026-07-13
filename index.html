@@ -799,7 +799,7 @@
       finish(
         data.email
           ? "Мы разберём ваши вопросы и пришлём ответы на " + data.email + "."
-          : "Мы разберём ваши вопросы и опубликуем ответы для всех участников."
+          : "Мы разберём ваши вопросы и ответим на них."
       );
     } catch (err) {
       save(new Blob(["﻿" + asDoc(data)], { type: "application/msword" }), fileStamp(data) + ".doc");
