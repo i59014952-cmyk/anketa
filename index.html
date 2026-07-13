@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Анкета обратной связи по лекции: оценка, комментарий и вопросы, которые не успели задать." />
+<style>*,*::before,*::after{box-sizing:border-box}</style>
+<title>Анкета обратной связи по лекции</title>
+
+<style>
+  :root {
+    --blue: #008AD1;
+    --blue-deep: #0570A6;
+    --lime: #B1C900;
+    --ink: #26262C;
+    --ink-soft: #55555F;
+    --muted: #8A8A94;
+    --ground: #F7F9FB;
+    --card: #FFFFFF;
+    --line: #DFE5EA;
+    --field: #FFFFFF;
+    --danger: #C0392B;
+    --shadow: 0 1px 2px rgba(38,38,44,.05), 0 12px 32px -18px rgba(38,38,44,.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --blue: #35A7E0;
+      --blue-deep: #62BCEA;
+      --lime: #C4DC1F;
+      --ink: #ECEFF3;
+      --ink-soft: #AFB6C0;
+      --muted: #7C838E;
+      --ground: #16181C;
+      --card: #1E2126;
+      --line: #2E333A;
+      --field: #23272D;
+      --danger: #E97C6E;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -22px rgba(0,0,0,.8);
+    }
+  }
+
+  :root[data-theme="light"] {
+    --blue: #008AD1; --blue-deep: #0570A6; --lime: #B1C900;
+    --ink: #26262C; --ink-soft: #55555F; --muted: #8A8A94;
+    --ground: #F7F9FB; --card: #FFFFFF; --line: #DFE5EA; --field: #FFFFFF;
+    --danger: #C0392B;
+    --shadow: 0 1px 2px rgba(38,38,44,.05), 0 12px 32px -18px rgba(38,38,44,.35);
+  }
+
+  :root[data-theme="dark"] {
+    --blue: #35A7E0; --blue-deep: #62BCEA; --lime: #C4DC1F;
+    --ink: #ECEFF3; --ink-soft: #AFB6C0; --muted: #7C838E;
+    --ground: #16181C; --card: #1E2126; --line: #2E333A; --field: #23272D;
+    --danger: #E97C6E;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -22px rgba(0,0,0,.8);
+  }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ---------- Шапка ---------- */
+  .masthead {
+    border-top: 4px solid var(--blue);
+    padding: 36px 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .eyebrow .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--lime);
+    flex: none;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  .lede {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--ink-soft);
+    font-size: 17px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+  .chip {
+    font-size: 13px;
+    padding: 5px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink-soft);
+  }
+  .chip b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Секции ---------- */
+  form { display: flex; flex-direction: column; gap: 20px; }
+
+  section.block {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 26px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .block-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .block-head h2 {
+    margin: 0;
+    font-size: 19px;
+    letter-spacing: -.01em;
+    font-weight: 700;
+  }
+  .block-head p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field > label, .field > .q {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .req { color: var(--blue); }
+
+  input[type="text"], input[type="email"], textarea, select {
+    font: inherit;
+    color: var(--ink);
+    background: var(--field);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 11px 13px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
+  textarea.tall { min-height: 130px; }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 22%, transparent);
+  }
+  button:focus-visible, .scale input:focus-visible + span {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
+
+  /* ---------- Шкала 1–5 ---------- */
+  .scale {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .scale input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .scale label { cursor: pointer; }
+  .scale span {
+    display: block;
+    text-align: center;
+    padding: 10px 4px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--field);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .scale label:hover span { border-color: var(--blue); color: var(--blue); }
+  .scale input:checked + span {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+  .scale-ends {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ---------- Радио / чекбоксы ---------- */
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opts.row { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 13px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--field);
+    cursor: pointer;
+    font-size: 15px;
+    transition: border-color .12s, background .12s;
+  }
+  .opt:hover { border-color: var(--blue); }
+  .opt input { accent-color: var(--blue); width: 17px; height: 17px; flex: none; margin: 0; }
+  .opt:has(input:checked) {
+    border-color: var(--blue);
+    background: color-mix(in srgb, var(--blue) 7%, var(--field));
+  }
+  .opts.row .opt { flex: 1 1 160px; }
+
+  /* ---------- Блок вопросов (акцент) ---------- */
+  section.block.questions {
+    border-left: 4px solid var(--lime);
+  }
+  .qcount {
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Согласие + кнопки ---------- */
+  .consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .consent input { accent-color: var(--blue); width: 17px; height: 17px; margin: 2px 0 0; flex: none; }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  button {
+    font: inherit;
+    font-weight: 600;
+    border-radius: 7px;
+    padding: 13px 22px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    flex: 1 1 240px;
+  }
+  .btn-primary:hover { background: var(--blue-deep); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+  button[disabled] { opacity: .55; cursor: not-allowed; }
+
+  .status {
+    font-size: 14px;
+    min-height: 20px;
+  }
+  .status.err { color: var(--danger); font-weight: 600; }
+  .status.ok { color: var(--blue); font-weight: 600; }
+
+  /* ---------- Экран благодарности ---------- */
+  .done {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--lime);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 40px 28px;
+    text-align: center;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+  .done.show { display: flex; }
+  .done h2 { margin: 0; font-size: 24px; }
+  .done p { margin: 0; color: var(--ink-soft); max-width: 46ch; }
+  .done .actions { justify-content: center; margin-top: 8px; }
+
+  footer {
+    margin-top: 34px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    justify-content: space-between;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow"><span class="dot"></span> Обратная связь после лекции</div>
+    <h1>Как прошла лекция и что осталось непонятным</h1>
+    <p class="lede">
+      Анкета занимает 3–4 минуты. Отдельный блок — для вопросов, которые вы не успели задать
+      во время выступления: мы соберём их, разберём и вернёмся с ответами.
+    </p>
+    <div class="meta">
+      <span class="chip">Тема: <b id="chip-topic">—</b></span>
+      <span class="chip">Дата: <b id="chip-date">—</b></span>
+      <span class="chip">Анонимно — по желанию</span>
+    </div>
+  </header>
+
+  <form id="form" novalidate>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>О лекции</h2>
+        <p>Заполняется автоматически, при необходимости поправьте</p>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="topic">Тема лекции</label>
+          <input type="text" id="topic" name="topic" placeholder="Название лекции" />
+        </div>
+        <div class="field">
+          <label for="lecturer">Лектор</label>
+          <input type="text" id="lecturer" name="lecturer" placeholder="ФИО выступающего" />
+        </div>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="date">Дата лекции</label>
+          <input type="text" id="date" name="date" placeholder="13.07.2026" />
+        </div>
+        <div class="field">
+          <label for="org">Организация / подразделение</label>
+          <input type="text" id="org" name="org" placeholder="Например: отдел ИБ" />
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Оценка</h2>
+        <p>1 — совсем не подошло, 5 — отлично</p>
+      </div>
+
+      <div class="field">
+        <div class="q" id="lbl-useful">Насколько лекция была полезной для вашей работы <span class="req">*</span></div>
+        <div class="scale" role="radiogroup" aria-labelledby="lbl-useful" data-scale="useful">
+          <label><input type="radio" name="useful" value="1" /><span>1</span></label>
+          <label><input type="radio" name="useful" value="2" /><span>2</span></label>
+          <label><input type="radio" name="useful" value="3" /><span>3</span></label>
+          <label><input type="radio" name="useful" value="4" /><span>4</span></label>
+          <label><input type="radio" name="useful" value="5" /><span>5</span></label>
+        </div>
+        <div class="scale-ends"><span>Бесполезно</span><span>Очень полезно</span></div>
+      </div>
+
+      <div class="field">
+        <div class="q" id="lbl-clarity">Насколько понятно был изложен материал <span class="req">*</span></div>
+        <div class="scale" role="radiogroup" aria-labelledby="lbl-clarity" data-scale="clarity">
+          <label><input type="radio" name="clarity" value="1" /><span>1</span></label>
+          <label><input type="radio" name="clarity" value="2" /><span>2</span></label>
+          <label><input type="radio" name="clarity" value="3" /><span>3</span></label>
+          <label><input type="radio" name="clarity" value="4" /><span>4</span></label>
+          <label><input type="radio" name="clarity" value="5" /><span>5</span></label>
+        </div>
+        <div class="scale-ends"><span>Ничего не понял</span><span>Всё ясно</span></div>
+      </div>
+
+      <div class="field">
+        <div class="q" id="lbl-pace">Темп подачи</div>
+        <div class="opts row" role="radiogroup" aria-labelledby="lbl-pace">
+          <label class="opt"><input type="radio" name="pace" value="Слишком медленно" /> Слишком медленно</label>
+          <label class="opt"><input type="radio" name="pace" value="В самый раз" /> В самый раз</label>
+          <label class="opt"><input type="radio" name="pace" value="Слишком быстро" /> Слишком быстро</label>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Что скажете по существу</h2>
+        <p>Необязательно — но нам это помогает больше всего</p>
+      </div>
+
+      <div class="field">
+        <label for="comment">Что было полезно, а чего не хватило</label>
+        <textarea id="comment" class="tall" name="comment" placeholder="Например: разбор реальных кейсов зашёл, а практики в конце не хватило"></textarea>
+      </div>
+    </section>
+
+    <section class="block questions">
+      <div class="block-head">
+        <h2>Вопросы, которые вы не успели задать</h2>
+        <p>Главное поле анкеты — мы разберём каждый вопрос и вернёмся с ответом</p>
+      </div>
+
+      <div class="field">
+        <label for="questions">Ваши вопросы</label>
+        <textarea id="questions" class="tall" name="questions" placeholder="Пишите по одному вопросу на строку — так их удобнее разбирать"></textarea>
+        <p class="hint"><span class="qcount" id="qcount">Вопросов: 0</span> — по одному на строку</p>
+      </div>
+
+      <div class="field">
+        <label for="next">Какие темы разобрать на следующих лекциях</label>
+        <textarea id="next" name="next" placeholder="Что вам действительно нужно в работе"></textarea>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Контакты</h2>
+        <p>Нужны, только если вы хотите получить персональный ответ на свои вопросы</p>
+      </div>
+
+      <div class="two">
+        <div class="field">
+          <label for="name">ФИО</label>
+          <input type="text" id="name" name="name" placeholder="Можно не указывать" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="email">E-mail для ответа</label>
+          <input type="email" id="email" name="email" placeholder="name@example.ru" autocomplete="email" />
+        </div>
+      </div>
+
+      <label class="consent">
+        <input type="checkbox" id="consent" name="consent" />
+        <span>Согласен на обработку указанных данных для подготовки ответов на вопросы и улучшения лекций. Если поля контактов пустые — анкета уходит анонимно.</span>
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary" id="submit">Отправить анкету</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+  </form>
+
+  <div class="done" id="done">
+    <h2>Спасибо, анкета принята</h2>
+    <p id="done-text">Мы разберём ваши вопросы и вернёмся с ответами. Ответ придёт на указанную почту.</p>
+    <div class="actions">
+      <button type="button" class="btn-ghost" id="again">Заполнить ещё одну</button>
+    </div>
+  </div>
+
+  <footer>
+    <span>Анкета обратной связи по лекции</span>
+    <span>Обработка ответов — организаторы</span>
+  </footer>
+</div>
+
+<script>
+  // Куда отправлять анкеты. Пустая строка = сетевая отправка выключена,
+  // работают кнопки «Скачать как документ Word» и «Скопировать текстом».
+  // Подставьте сюда URL Google Apps Script или свой /api/feedback — и заработает кнопка «Отправить».
+  const ENDPOINT = "";
+
+  const $ = (id) => document.getElementById(id);
+  const form = $("form");
+  const status = $("status");
+
+  // --- Предзаполнение темы/даты из ссылки: ?topic=...&lecturer=...&date=... ---
+  const params = new URLSearchParams(location.search);
+  const today = new Date().toLocaleDateString("ru-RU");
+  $("topic").value = params.get("topic") || "";
+  $("lecturer").value = params.get("lecturer") || "";
+  $("date").value = params.get("date") || today;
+
+  const syncChips = () => {
+    $("chip-topic").textContent = $("topic").value.trim() || "не указана";
+    $("chip-date").textContent = $("date").value.trim() || "—";
+  };
+  $("topic").addEventListener("input", syncChips);
+  $("date").addEventListener("input", syncChips);
+  syncChips();
+
+  // --- Счётчик вопросов ---
+  const qField = $("questions");
+  qField.addEventListener("input", () => {
+    const n = qField.value.split("\n").map((s) => s.trim()).filter(Boolean).length;
+    $("qcount").textContent = "Вопросов: " + n;
+  });
+
+  const val = (name) => {
+    const el = form.elements[name];
+    if (!el) return "";
+    if (el instanceof RadioNodeList) return el.value || "";
+    return (el.value || "").trim();
+  };
+
+  const collect = () => ({
+    submittedAt: new Date().toLocaleString("ru-RU"),
+    topic: val("topic"),
+    lecturer: val("lecturer"),
+    date: val("date"),
+    org: val("org"),
+    useful: val("useful"),
+    clarity: val("clarity"),
+    pace: val("pace"),
+    comment: val("comment"),
+    questions: val("questions"),
+    next: val("next"),
+    name: val("name"),
+    email: val("email"),
+  });
+
+  const LABELS = [
+    ["date", "Дата лекции"],
+    ["topic", "Тема лекции"],
+    ["lecturer", "Лектор"],
+    ["org", "Организация / подразделение"],
+    ["useful", "Польза для работы (1–5)"],
+    ["clarity", "Понятность изложения (1–5)"],
+    ["pace", "Темп подачи"],
+    ["comment", "Что было полезно, чего не хватило"],
+    ["questions", "Вопросы, которые не успели задать"],
+    ["next", "Темы для следующих лекций"],
+    ["name", "ФИО"],
+    ["email", "E-mail"],
+    ["submittedAt", "Заполнено"],
+  ];
+
+  const asText = (d) => {
+    const lines = ["АНКЕТА ОБРАТНОЙ СВЯЗИ ПО ЛЕКЦИИ", ""];
+    for (const [key, label] of LABELS) {
+      lines.push(label + ": " + (d[key] || "—"));
+    }
+    return lines.join("\n");
+  };
+
+  const esc = (s) =>
+    String(s || "—")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\n/g, "<br />");
+
+  const asDoc = (d) => {
+    const rows = LABELS.map(
+      ([key, label]) =>
+        '<tr><td style="width:34%;background:#F2F6F9;border:1px solid #DFE5EA;padding:8px;font-family:Arial;font-size:11pt;"><b>' +
+        label +
+        '</b></td><td style="border:1px solid #DFE5EA;padding:8px;font-family:Arial;font-size:11pt;">' +
+        esc(d[key]) +
+        "</td></tr>"
+    ).join("");
+    return (
+      '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">' +
+      '<head><meta charset="utf-8" /><title>Анкета обратной связи</title></head><body>' +
+      '<h1 style="font-family:Arial;font-size:16pt;color:#008AD1;">Анкета обратной связи по лекции</h1>' +
+      '<table cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">' +
+      rows +
+      "</table></body></html>"
+    );
+  };
+
+  const fileStamp = (d) =>
+    ("Анкета_" + (d.name || "аноним") + "_" + (d.date || "")).replace(/[^\wа-яА-ЯёЁ.-]+/g, "_");
+
+  const save = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const say = (msg, cls) => {
+    status.textContent = msg;
+    status.className = "status" + (cls ? " " + cls : "");
+  };
+
+  // --- Проверка обязательных полей ---
+  const validate = () => {
+    const d = collect();
+    if (!d.useful || !d.clarity) return "Поставьте оценку пользы и понятности — это обязательные поля.";
+    if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) return "Проверьте адрес почты — похоже, в нём опечатка.";
+    if (!$("consent").checked) return "Отметьте согласие на обработку данных, без него отправить нельзя.";
+    return null;
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const problem = validate();
+    if (problem) {
+      say(problem, "err");
+      return;
+    }
+    const data = collect();
+
+    if (!ENDPOINT) {
+      const d = collect();
+      save(new Blob(["﻿" + asDoc(d)], { type: "application/msword" }), fileStamp(d) + ".doc");
+      finish("Анкета сохранена файлом Word — отправьте его организаторам. Как только подключим приём ответов, файл будет уходить автоматически.");
+      return;
+    }
+
+    const btn = $("submit");
+    btn.disabled = true;
+    say("Отправляем…");
+    try {
+      // Google Apps Script не отвечает на preflight-запрос, поэтому шлём
+      // «простой» запрос с text/plain — тело всё равно остаётся JSON.
+      const isAppsScript = ENDPOINT.includes("script.google.com");
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": isAppsScript ? "text/plain;charset=utf-8" : "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      finish(
+        data.email
+          ? "Мы разберём ваши вопросы и пришлём ответы на " + data.email + "."
+          : "Мы разберём ваши вопросы и опубликуем ответы для всех участников."
+      );
+    } catch (err) {
+      save(new Blob(["﻿" + asDoc(data)], { type: "application/msword" }), fileStamp(data) + ".doc");
+      say("Связь с сервером не удалась (" + err.message + "), поэтому анкета сохранена файлом Word — пришлите его организаторам.", "err");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  const finish = (text) => {
+    $("done-text").textContent = text;
+    form.style.display = "none";
+    $("done").classList.add("show");
+    $("done").scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  $("again").addEventListener("click", () => {
+    form.reset();
+    $("qcount").textContent = "Вопросов: 0";
+    $("date").value = params.get("date") || today;
+    $("topic").value = params.get("topic") || "";
+    $("lecturer").value = params.get("lecturer") || "";
+    syncChips();
+    say("");
+    $("done").classList.remove("show");
+    form.style.display = "flex";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>
+
+</body>
+</html>
