@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Анкета рабочих задач: перечень выполняемых задач, должностные обязанности, используемые в работе программы." />
+<meta name="robots" content="noindex,nofollow" />
+<style>*,*::before,*::after{box-sizing:border-box}</style>
+<title>Анкета рабочих задач</title>
+
+<style>
+  :root {
+    --blue: #008AD1;
+    --blue-deep: #0570A6;
+    --lime: #B1C900;
+    --ink: #26262C;
+    --ink-soft: #55555F;
+    --muted: #8A8A94;
+    --ground: #F7F9FB;
+    --card: #FFFFFF;
+    --line: #DFE5EA;
+    --field: #FFFFFF;
+    --danger: #C0392B;
+    --shadow: 0 1px 2px rgba(38,38,44,.05), 0 12px 32px -18px rgba(38,38,44,.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --blue: #35A7E0; --blue-deep: #62BCEA; --lime: #C4DC1F;
+      --ink: #ECEFF3; --ink-soft: #AFB6C0; --muted: #7C838E;
+      --ground: #16181C; --card: #1E2126; --line: #2E333A; --field: #23272D;
+      --danger: #E97C6E;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -22px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="light"] {
+    --blue: #008AD1; --blue-deep: #0570A6; --lime: #B1C900;
+    --ink: #26262C; --ink-soft: #55555F; --muted: #8A8A94;
+    --ground: #F7F9FB; --card: #FFFFFF; --line: #DFE5EA; --field: #FFFFFF;
+    --danger: #C0392B;
+    --shadow: 0 1px 2px rgba(38,38,44,.05), 0 12px 32px -18px rgba(38,38,44,.35);
+  }
+  :root[data-theme="dark"] {
+    --blue: #35A7E0; --blue-deep: #62BCEA; --lime: #C4DC1F;
+    --ink: #ECEFF3; --ink-soft: #AFB6C0; --muted: #7C838E;
+    --ground: #16181C; --card: #1E2126; --line: #2E333A; --field: #23272D;
+    --danger: #E97C6E;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 40px -22px rgba(0,0,0,.8);
+  }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* ---------- Шапка ---------- */
+  .masthead {
+    border-top: 4px solid var(--blue);
+    padding: 36px 0 28px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .eyebrow {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+  }
+  .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); flex: none; }
+  h1 {
+    margin: 0; font-size: clamp(28px, 5vw, 40px); line-height: 1.15;
+    letter-spacing: -.02em; font-weight: 700; text-wrap: balance;
+  }
+  .lede { margin: 0; max-width: 62ch; color: var(--ink-soft); font-size: 17px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+  .chip {
+    font-size: 13px; padding: 5px 11px; border: 1px solid var(--line);
+    border-radius: 999px; background: var(--card); color: var(--ink-soft);
+  }
+  .chip b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Секции ---------- */
+  form { display: flex; flex-direction: column; gap: 20px; }
+  section.block {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: var(--shadow); padding: 26px 24px;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .block-head {
+    display: flex; flex-direction: column; gap: 4px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--line);
+  }
+  .block-head h2 { margin: 0; font-size: 19px; letter-spacing: -.01em; font-weight: 700; }
+  .block-head p { margin: 0; font-size: 14px; color: var(--muted); }
+
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field > label, .field > .q { font-size: 15px; font-weight: 600; }
+  .hint { font-size: 13px; color: var(--muted); margin: 0; }
+  .req { color: var(--blue); }
+
+  input[type="text"], input[type="email"], textarea, select {
+    font: inherit; color: var(--ink); background: var(--field);
+    border: 1px solid var(--line); border-radius: 7px;
+    padding: 11px 13px; width: 100%; box-sizing: border-box;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  select { appearance: none; background-image: none; cursor: pointer; }
+  textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
+  textarea.short { min-height: 62px; }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: none; border-color: var(--blue);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 22%, transparent);
+  }
+  button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .bad { border-color: var(--danger) !important; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 620px) { .two { grid-template-columns: 1fr; } }
+
+  /* ---------- Чекбоксы программ ---------- */
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opts.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 620px) { .opts.grid { grid-template-columns: 1fr; } }
+  .opt {
+    display: flex; align-items: center; gap: 9px; padding: 10px 13px;
+    border: 1px solid var(--line); border-radius: 7px; background: var(--field);
+    cursor: pointer; font-size: 15px; transition: border-color .12s, background .12s;
+  }
+  .opt:hover { border-color: var(--blue); }
+  .opt input { accent-color: var(--blue); width: 17px; height: 17px; flex: none; margin: 0; }
+  .opt:has(input:checked) { border-color: var(--blue); background: color-mix(in srgb, var(--blue) 7%, var(--field)); }
+
+  /* ---------- Блок задач ---------- */
+  section.block.tasks { border-left: 4px solid var(--lime); }
+  .tcount { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .tasklist { display: flex; flex-direction: column; gap: 16px; }
+  .task {
+    border: 1px solid var(--line); border-radius: 9px; background: var(--field);
+    padding: 18px 16px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .task-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .task-num {
+    font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .task-del {
+    background: none; border: none; color: var(--muted); font-size: 14px;
+    padding: 4px 8px; cursor: pointer; border-radius: 6px; font-weight: 600;
+  }
+  .task-del:hover { color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, transparent); }
+  .task .two { gap: 14px; }
+
+  /* ---------- Согласие + кнопки ---------- */
+  .consent {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 14px; color: var(--ink-soft); line-height: 1.5;
+  }
+  .consent input { accent-color: var(--blue); width: 17px; height: 17px; margin: 2px 0 0; flex: none; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  button {
+    font: inherit; font-weight: 600; border-radius: 7px; padding: 13px 22px;
+    cursor: pointer; border: 1px solid transparent;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .btn-primary { background: var(--blue); color: #fff; flex: 1 1 240px; }
+  .btn-primary:hover { background: var(--blue-deep); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+  button[disabled] { opacity: .55; cursor: not-allowed; }
+  .status { font-size: 14px; min-height: 20px; }
+  .status.err { color: var(--danger); font-weight: 600; }
+  .status.ok { color: var(--blue); font-weight: 600; }
+  .saved { font-size: 13px; color: var(--muted); }
+
+  /* ---------- Экран благодарности ---------- */
+  .done {
+    display: none; background: var(--card); border: 1px solid var(--line);
+    border-top: 4px solid var(--lime); border-radius: 10px; box-shadow: var(--shadow);
+    padding: 40px 28px; text-align: center; flex-direction: column; gap: 14px; align-items: center;
+  }
+  .done.show { display: flex; }
+  .done h2 { margin: 0; font-size: 24px; }
+  .done p { margin: 0; color: var(--ink-soft); max-width: 46ch; }
+  .done .actions { justify-content: center; margin-top: 8px; }
+
+  /* ---------- Панель организатора (?setup) ---------- */
+  section.block.setup { display: none; }
+  section.block.setup.show { display: flex; }
+  .link-out {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px;
+    line-height: 1.5; word-break: break-all; background: var(--field);
+    border: 1px solid var(--line); border-radius: 7px; padding: 12px 13px; color: var(--blue);
+  }
+
+  footer {
+    margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--muted);
+    display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: space-between;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow"><span class="dot"></span> Внутреннее анкетирование</div>
+    <h1>Анкета рабочих задач</h1>
+    <p class="lede">
+      Цель анкетирования — определить перечень задач, выполняемых вами в течение рабочего
+      дня, и состав программного обеспечения, с которым вы работаете. Анкета не является
+      формой оценки сотрудника и не влияет на результаты вашей работы.
+    </p>
+    <p class="lede">
+      По итогам обработки ответов вам будет направлена подборка практических примеров
+      решения аналогичных задач с применением ИИ-ассистента. Заполнение занимает 7–10 минут,
+      черновик сохраняется автоматически.
+    </p>
+    <div class="meta">
+      <span class="chip">Организация: <b id="chip-org">—</b></span>
+      <span class="chip">Подразделение: <b id="chip-dept">—</b></span>
+      <span class="chip">Черновик сохраняется автоматически</span>
+    </div>
+  </header>
+
+  <!-- Панель организатора: открывается по адресу ...?setup — сотрудникам не видна -->
+  <section class="block setup" id="setup">
+    <div class="block-head">
+      <h2>Ссылка для рассылки</h2>
+      <p>Заполните организацию и подразделение — получите готовую ссылку. У сотрудника эти поля будут подставлены заранее.</p>
+    </div>
+    <div class="two">
+      <div class="field">
+        <label for="s-org">Организация</label>
+        <input type="text" id="s-org" placeholder="Татэнерго" />
+      </div>
+      <div class="field">
+        <label for="s-dept">Подразделение</label>
+        <input type="text" id="s-dept" placeholder="Бухгалтерия" />
+      </div>
+    </div>
+    <div class="field">
+      <span class="q">Готовая ссылка</span>
+      <div class="link-out" id="s-link">—</div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn-primary" id="s-copy">Скопировать ссылку</button>
+      <button type="button" class="btn-ghost" id="s-open">Открыть и проверить</button>
+    </div>
+    <div class="status" id="s-status" role="status" aria-live="polite"></div>
+  </section>
+
+  <form id="form" novalidate>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>О вас</h2>
+        <p>Сведения необходимы для сопоставления задач с должностью: ответы по одинаковым должностям объединяются</p>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="name">ФИО <span class="req">*</span></label>
+          <input type="text" id="name" name="name" autocomplete="name" placeholder="Иванов Иван Иванович" />
+        </div>
+        <div class="field">
+          <label for="position">Должность <span class="req">*</span></label>
+          <input type="text" id="position" name="position" placeholder="Ведущий бухгалтер" />
+        </div>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="org">Организация <span class="req">*</span></label>
+          <input type="text" id="org" name="org" placeholder="Название компании" />
+        </div>
+        <div class="field">
+          <label for="dept">Подразделение / отдел</label>
+          <input type="text" id="dept" name="dept" placeholder="Бухгалтерия" />
+        </div>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="exp">Стаж работы в должности</label>
+          <select id="exp" name="exp">
+            <option value="">Выберите</option>
+            <option>Меньше года</option>
+            <option>1–3 года</option>
+            <option>3–5 лет</option>
+            <option>5–10 лет</option>
+            <option>Больше 10 лет</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="email">Рабочая электронная почта</label>
+          <input type="email" id="email" name="email" autocomplete="email" placeholder="ivanov@company.ru" />
+          <p class="hint">Не обязательно.</p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="contact">Телефон или ник в Telegram <span class="req">*</span></label>
+        <input type="text" id="contact" name="contact" placeholder="+7 900 000-00-00 или @nickname" />
+        <p class="hint">
+          На указанный контакт будет направлен разбор ваших задач и подборка практических
+          примеров их решения. Он же используется для уточнений по анкете, если они потребуются.
+        </p>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Обязанности</h2>
+        <p>Своими словами, без цитат из должностной инструкции</p>
+      </div>
+      <div class="field">
+        <label for="duties">Зона ответственности <span class="req">*</span></label>
+        <textarea id="duties" name="duties" placeholder="Например: учёт основных средств, закрытие месяца по своему участку, подготовка ответов на требования налогового органа, сверка с подрядчиками."></textarea>
+        <p class="hint">Достаточно 2–4 предложений, описывающих вашу работу в целом.</p>
+      </div>
+      <div class="field">
+        <label for="flow">Кто ставит задачи и кому передаётся результат</label>
+        <textarea id="flow" class="short" name="flow" placeholder="Задачи — от главного бухгалтера и от подразделений; результат — в налоговую, руководителю на подпись, в 1С."></textarea>
+      </div>
+    </section>
+
+    <section class="block tasks">
+      <div class="block-head">
+        <h2>Задачи</h2>
+        <p>Основной раздел анкеты. Укажите регулярно повторяющиеся задачи — ежедневные, еженедельные, ежемесячные. Разовые поручения указывать не требуется.</p>
+      </div>
+
+      <div class="tasklist" id="tasklist"></div>
+
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="add-task">+ Добавить задачу</button>
+        <span class="tcount" id="tcount">Задач заполнено: 0</span>
+      </div>
+      <p class="hint">
+        Достаточно 5–8 задач, составляющих обычную рабочую неделю. Если задача занимает
+        полный рабочий день, укажите это.
+      </p>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Программы</h2>
+        <p>Отметьте программы, используемые в работе не реже одного раза в неделю</p>
+      </div>
+      <div class="opts grid" id="apps">
+        <label class="opt"><input type="checkbox" name="apps" value="Excel / Google Таблицы" /> Excel / Google Таблицы</label>
+        <label class="opt"><input type="checkbox" name="apps" value="Word / Google Документы" /> Word / Google Документы</label>
+        <label class="opt"><input type="checkbox" name="apps" value="Электронная почта" /> Электронная почта</label>
+        <label class="opt"><input type="checkbox" name="apps" value="1С" /> 1С</label>
+        <label class="opt"><input type="checkbox" name="apps" value="СЭД (документооборот)" /> СЭД (документооборот)</label>
+        <label class="opt"><input type="checkbox" name="apps" value="CRM / Битрикс24" /> CRM / Битрикс24</label>
+        <label class="opt"><input type="checkbox" name="apps" value="Консультант+ / Гарант" /> Консультант+ / Гарант</label>
+        <label class="opt"><input type="checkbox" name="apps" value="PowerPoint / презентации" /> PowerPoint / презентации</label>
+        <label class="opt"><input type="checkbox" name="apps" value="AutoCAD / nanoCAD / чертежи" /> AutoCAD / nanoCAD / чертежи</label>
+        <label class="opt"><input type="checkbox" name="apps" value="PDF-редакторы, сканы" /> PDF-редакторы, сканы</label>
+        <label class="opt"><input type="checkbox" name="apps" value="Мессенджеры (рабочие чаты)" /> Мессенджеры (рабочие чаты)</label>
+        <label class="opt"><input type="checkbox" name="apps" value="Внутренний портал / база знаний" /> Внутренний портал / база знаний</label>
+        <label class="opt"><input type="checkbox" name="apps" value="Госпорталы (ЕИС, ФНС, СБИС и т. п.)" /> Госпорталы (ЕИС, ФНС, СБИС)</label>
+        <label class="opt"><input type="checkbox" name="apps" value="ИИ-ассистент" /> ИИ-ассистент</label>
+      </div>
+      <div class="field">
+        <label for="apps_other">Отраслевые и прочие программы</label>
+        <input type="text" id="apps_other" name="apps_other" placeholder="Через запятую: SAP, Компас-3D, ГИС ЖКХ" />
+      </div>
+      <div class="field">
+        <label for="apps_pain">Перенос данных между программами вручную</label>
+        <textarea id="apps_pain" class="short" name="apps_pain" placeholder="Например: выгрузка из 1С в Excel, ручная сверка с банковской выпиской."></textarea>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Затраты рабочего времени</h2>
+        <p>Ответы на эти вопросы определяют, какие задачи будут рассмотрены в первую очередь</p>
+      </div>
+      <div class="field">
+        <label for="heavy">Задачи, занимающие наибольшую часть рабочего времени <span class="req">*</span></label>
+        <textarea id="heavy" name="heavy" class="short" placeholder="Например: свод отчёта по подразделениям — два дня в конце месяца."></textarea>
+      </div>
+      <div class="field">
+        <label for="manual">Действия, выполняемые вручную, несмотря на их повторяемость</label>
+        <textarea id="manual" name="manual" class="short" placeholder="Например: повторный набор одного и того же ответа на типовое требование."></textarea>
+      </div>
+      <div class="field">
+        <label for="delegate">Задачи, которые вы передали бы помощнику</label>
+        <textarea id="delegate" name="delegate" class="short" placeholder="Например: подготовка черновиков писем, первичная проверка комплектности документов."></textarea>
+      </div>
+      <div class="field">
+        <label for="comment">Дополнительные сведения о вашей работе</label>
+        <textarea id="comment" name="comment" class="short" placeholder="Свободное поле для сведений, не вошедших в предыдущие вопросы."></textarea>
+      </div>
+    </section>
+
+    <section class="block">
+      <label class="consent">
+        <input type="checkbox" id="consent" />
+        <span>Я согласен, что ответы будут использованы для анализа рабочих процессов внутри организации. <span class="req">*</span></span>
+      </label>
+      <div class="actions">
+        <button type="submit" class="btn-primary" id="submit">Отправить анкету</button>
+        <button type="button" class="btn-ghost" id="clear">Очистить черновик</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <div class="saved" id="saved"></div>
+    </section>
+  </form>
+
+  <section class="done" id="done">
+    <h2>Анкета отправлена</h2>
+    <p id="done-text">Спасибо. Мы проанализируем ответы, подготовим кейсы под ваши задачи и свяжемся с вами.</p>
+    <div class="actions">
+      <button type="button" class="btn-ghost" id="again">Заполнить ещё одну</button>
+    </div>
+  </section>
+
+  <footer>
+    <span>Анкета внутренняя. Ответы видит рабочая группа проекта.</span>
+    <span>anketa-lekcii.ru</span>
+  </footer>
+
+</div>
+<script>
+  // Адрес приёмника Google Apps Script. Пусто — анкета сохраняется файлом Word.
+  const ENDPOINT = "https://script.google.com/macros/s/AKfycbwMjnrl6TliTHP8giEtBIagOuFGcTyEpt_sU-CvUMH67HKUhjJtb8DWJdoSCUZT7TSVyA/exec";
+
+  const $ = (id) => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const DRAFT = "zadachi-draft-v1";
+
+  // Коды уходят в таблицу вместе с подписью: по коду Apps Script считает часы в месяц,
+  // подпись показывается человеку. Считать часы здесь же нельзя — разъедется с таблицей.
+  const FREQ = [
+    ["day_many",  "Несколько раз в день"],
+    ["day",       "Каждый день"],
+    ["week_few",  "Несколько раз в неделю"],
+    ["week",      "Раз в неделю"],
+    ["month_few", "Несколько раз в месяц"],
+    ["month",     "Раз в месяц"],
+    ["rare",      "Реже раза в месяц"],
+  ];
+  const DUR = [
+    ["m15", "До 15 минут"],
+    ["m30", "15–30 минут"],
+    ["m60", "30–60 минут"],
+    ["h3",  "1–3 часа"],
+    ["h8",  "3–8 часов"],
+    ["d1",  "Больше рабочего дня"],
+  ];
+  const OUT = [
+    "Документ", "Письмо или ответ", "Расчёт, таблица", "Презентация",
+    "Согласование, подпись", "Консультация коллеге", "Данные внесены в систему", "Другое",
+  ];
+
+  const esc = (s) => String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  const optionsOf = (list) => list
+    .map((it) => Array.isArray(it)
+      ? '<option value="' + it[0] + '">' + esc(it[1]) + "</option>"
+      : '<option value="' + esc(it) + '">' + esc(it) + "</option>")
+    .join("");
+
+  /* ---------- Карточки задач ---------- */
+  const list = $("tasklist");
+  let seq = 0;
+
+  function addTask(v) {
+    v = v || {};
+    const i = seq++;
+    const box = document.createElement("div");
+    box.className = "task";
+    box.dataset.i = i;
+    box.innerHTML =
+      '<div class="task-head">' +
+        '<span class="task-num">Задача</span>' +
+        '<button type="button" class="task-del" title="Удалить задачу">Удалить</button>' +
+      "</div>" +
+      '<div class="field">' +
+        '<label for="t' + i + '-what">Содержание задачи</label>' +
+        '<input type="text" id="t' + i + '-what" data-k="what" placeholder="Например: подготовка ответа на требование налогового органа" />' +
+      "</div>" +
+      '<div class="two">' +
+        '<div class="field">' +
+          '<label for="t' + i + '-freq">Периодичность</label>' +
+          '<select id="t' + i + '-freq" data-k="freq"><option value="">Выберите</option>' + optionsOf(FREQ) + "</select>" +
+        "</div>" +
+        '<div class="field">' +
+          '<label for="t' + i + '-dur">Продолжительность одного выполнения</label>' +
+          '<select id="t' + i + '-dur" data-k="dur"><option value="">Выберите</option>' + optionsOf(DUR) + "</select>" +
+        "</div>" +
+      "</div>" +
+      '<div class="two">' +
+        '<div class="field">' +
+          '<label for="t' + i + '-apps">Используемые программы</label>' +
+          '<input type="text" id="t' + i + '-apps" data-k="apps" placeholder="1С, Excel, Консультант+" />' +
+        "</div>" +
+        '<div class="field">' +
+          '<label for="t' + i + '-out">Результат выполнения</label>' +
+          '<select id="t' + i + '-out" data-k="out"><option value="">Выберите</option>' + optionsOf(OUT) + "</select>" +
+        "</div>" +
+      "</div>" +
+      '<div class="field">' +
+        '<label for="t' + i + '-pain">Наиболее трудоёмкая часть задачи</label>' +
+        '<textarea id="t' + i + '-pain" class="short" data-k="pain" placeholder="Например: сбор данных из четырёх источников и сведение вручную."></textarea>' +
+      "</div>";
+
+    list.appendChild(box);
+    box.querySelectorAll("[data-k]").forEach((el) => {
+      if (v[el.dataset.k]) el.value = v[el.dataset.k];
+    });
+    box.querySelector(".task-del").addEventListener("click", () => {
+      box.remove();
+      if (!list.children.length) addTask();
+      renumber();
+      saveDraft();
+    });
+    renumber();
+    return box;
+  }
+
+  function renumber() {
+    [...list.children].forEach((b, n) => {
+      b.querySelector(".task-num").textContent = "Задача " + (n + 1);
+    });
+    $("tcount").textContent = "Задач заполнено: " + tasks().length;
+  }
+
+  function tasks() {
+    return [...list.children]
+      .map((b) => {
+        const o = {};
+        b.querySelectorAll("[data-k]").forEach((el) => { o[el.dataset.k] = el.value.trim(); });
+        const sel = (id, code) => {
+          const t = (FREQ.concat(DUR)).find((x) => x[0] === code);
+          return t ? t[1] : "";
+        };
+        o.freqLabel = sel(0, o.freq);
+        o.durLabel = sel(0, o.dur);
+        return o;
+      })
+      .filter((o) => o.what);
+  }
+
+  $("add-task").addEventListener("click", () => {
+    const box = addTask();
+    box.querySelector("input").focus();
+    box.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  /* ---------- Сбор и проверка ---------- */
+  const val = (id) => ($(id) ? $(id).value.trim() : "");
+
+  function collect() {
+    return {
+      submittedAt: new Date().toLocaleString("ru-RU"),
+      name: val("name"), position: val("position"), org: val("org"), dept: val("dept"),
+      exp: val("exp"), email: val("email"), contact: val("contact"),
+      duties: val("duties"), flow: val("flow"),
+      apps: [...document.querySelectorAll('#apps input:checked')].map((c) => c.value).join(", "),
+      apps_other: val("apps_other"), apps_pain: val("apps_pain"),
+      heavy: val("heavy"), manual: val("manual"), delegate: val("delegate"), comment: val("comment"),
+      tasks: tasks(),
+    };
+  }
+
+  const say = (text, cls) => {
+    const s = $("status");
+    s.textContent = text;
+    s.className = "status" + (cls ? " " + cls : "");
+  };
+
+  function validate(d) {
+    document.querySelectorAll(".bad").forEach((el) => el.classList.remove("bad"));
+    const miss = [];
+    const need = { name: "ФИО", position: "должность", org: "организацию", contact: "телефон или ник в Telegram",
+                   duties: "обязанности", heavy: "наиболее трудоёмкие задачи" };
+    for (const k in need) if (!d[k]) { miss.push(need[k]); $(k).classList.add("bad"); }
+    if (!d.tasks.length) miss.push("хотя бы одну задачу");
+    if (!$("consent").checked) miss.push("согласие внизу");
+    if (miss.length) {
+      say("Заполните: " + miss.join(", ") + ".", "err");
+      const first = document.querySelector(".bad") || (!d.tasks.length ? list : $("consent"));
+      first.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    return true;
+  }
+
+  /* ---------- Черновик ---------- */
+  let timer = null;
+  function saveDraft() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT, JSON.stringify(collect()));
+        $("saved").textContent = "Черновик сохранён в " + new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+      } catch (e) { /* приватный режим или file:// — обходимся без черновика */ }
+      renumber();
+    }, 400);
+  }
+
+  function restoreDraft() {
+    let d = null;
+    try { d = JSON.parse(localStorage.getItem(DRAFT) || "null"); } catch (e) {}
+    if (!d) return false;
+    ["name", "position", "org", "dept", "exp", "email", "contact", "duties", "flow",
+     "apps_other", "apps_pain", "heavy", "manual", "delegate", "comment"].forEach((k) => {
+      if ($(k) && d[k]) $(k).value = d[k];
+    });
+    if (d.apps) {
+      const set = new Set(d.apps.split(", "));
+      document.querySelectorAll('#apps input').forEach((c) => { c.checked = set.has(c.value); });
+    }
+    (d.tasks || []).forEach((t) => addTask(t));
+    return true;
+  }
+
+  $("clear").addEventListener("click", () => {
+    if (!confirm("Стереть введённое и начать заново?")) return;
+    try { localStorage.removeItem(DRAFT); } catch (e) {}
+    location.reload();
+  });
+
+  /* ---------- Запасной путь: файл Word ---------- */
+  function asDoc(d) {
+    const row = (k, v) => v ? "<p><b>" + esc(k) + ":</b> " + esc(v).replace(/\n/g, "<br>") + "</p>" : "";
+    const t = d.tasks.map((x, n) =>
+      "<p><b>Задача " + (n + 1) + ".</b> " + esc(x.what) + "<br>" +
+      "Частота: " + esc(x.freqLabel) + " · Длительность: " + esc(x.durLabel) + "<br>" +
+      "Программы: " + esc(x.apps) + " · Результат: " + esc(x.out) +
+      (x.pain ? "<br>Трудоёмкая часть: " + esc(x.pain) : "") + "</p>"
+    ).join("");
+    return "<html><head><meta charset='utf-8'></head><body>" +
+      "<h2>Анкета: задачи и программы сотрудника</h2>" +
+      row("Заполнено", d.submittedAt) + row("ФИО", d.name) + row("Должность", d.position) +
+      row("Организация", d.org) + row("Подразделение", d.dept) + row("Стаж в должности", d.exp) +
+      row("Почта", d.email) + row("Телефон / Telegram", d.contact) + row("Обязанности", d.duties) + row("Постановка и результат", d.flow) +
+      "<h3>Задачи</h3>" + t +
+      "<h3>Программы</h3>" + row("Отмечено", d.apps) + row("Прочее", d.apps_other) + row("Ручной перенос данных", d.apps_pain) +
+      "<h3>Что съедает время</h3>" + row("Больше всего времени", d.heavy) + row("Делается руками", d.manual) +
+      row("Отдал бы помощнику", d.delegate) + row("Ещё", d.comment) +
+      "</body></html>";
+  }
+
+  function save(blob, filename) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  const stamp = (d) => "Анкета — " + (d.name || "без имени").replace(/[\\/:*?"<>|]/g, " ").trim();
+
+  /* ---------- Отправка ---------- */
+  const form = $("form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const d = collect();
+    if (!validate(d)) return;
+
+    if (!ENDPOINT) {
+      save(new Blob(["﻿" + asDoc(d)], { type: "application/msword" }), stamp(d) + ".doc");
+      finish("Анкета сохранена файлом Word — отправьте его в рабочую группу. Как только подключим приём ответов, файл будет уходить сам.");
+      return;
+    }
+
+    const btn = $("submit");
+    btn.disabled = true;
+    // Приёмник отвечает не сразу — замерено 17 с на «холодном» запуске.
+    // Без предупреждения это выглядит как зависшая страница, и анкету закрывают.
+    // Название сервиса в подписи не упоминается: сотруднику незачем знать,
+    // чем анкета устроена изнутри.
+    say("Отправляем… это может занять до 20 секунд, не закрывайте страницу.");
+    try {
+      // Apps Script не отвечает на preflight, поэтому шлём «простой» запрос
+      // с text/plain — тело при этом остаётся JSON.
+      const isAppsScript = ENDPOINT.includes("script.google.com");
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": isAppsScript ? "text/plain;charset=utf-8" : "application/json" },
+        body: JSON.stringify(d),
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      try { localStorage.removeItem(DRAFT); } catch (err) {}
+      finish("Спасибо. Вы описали задач: " + d.tasks.length +
+             ". Мы проанализируем ответы, подготовим кейсы под ваши задачи и свяжемся с вами — " +
+             d.contact + ".");
+    } catch (err) {
+      save(new Blob(["﻿" + asDoc(d)], { type: "application/msword" }), stamp(d) + ".doc");
+      say("Связь с сервером не удалась (" + err.message + "), поэтому анкета сохранена файлом Word — пришлите его в рабочую группу.", "err");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  const finish = (text) => {
+    $("done-text").textContent = text;
+    form.style.display = "none";
+    $("done").classList.add("show");
+    $("done").scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  $("again").addEventListener("click", () => {
+    try { localStorage.removeItem(DRAFT); } catch (e) {}
+    location.reload();
+  });
+
+  /* ---------- Панель организатора ---------- */
+  if (params.has("setup")) {
+    $("setup").classList.add("show");
+    const base = location.origin + location.pathname;
+    const build = () => {
+      const q = new URLSearchParams();
+      if ($("s-org").value.trim()) q.set("org", $("s-org").value.trim());
+      if ($("s-dept").value.trim()) q.set("dept", $("s-dept").value.trim());
+      const s = q.toString();
+      $("s-link").textContent = base + (s ? "?" + s : "");
+      return $("s-link").textContent;
+    };
+    ["s-org", "s-dept"].forEach((id) => $(id).addEventListener("input", build));
+    build();
+    $("s-copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(build());
+        $("s-status").textContent = "Ссылка скопирована.";
+        $("s-status").className = "status ok";
+      } catch (e) {
+        $("s-status").textContent = "Скопируйте ссылку вручную из поля выше.";
+        $("s-status").className = "status err";
+      }
+    });
+    $("s-open").addEventListener("click", () => window.open(build(), "_blank"));
+  }
+
+  /* ---------- Старт ---------- */
+  const had = restoreDraft();
+  ["org", "dept", "position", "name"].forEach((k) => {
+    if (params.get(k) && !$(k).value) $(k).value = params.get(k);
+  });
+  $("chip-org").textContent = $("org").value || "укажите в анкете";
+  $("chip-dept").textContent = $("dept").value || "укажите в анкете";
+  ["org", "dept"].forEach((k) => $(k).addEventListener("input", () => {
+    $("chip-" + k).textContent = $(k).value || "укажите в анкете";
+  }));
+
+  if (!list.children.length) { addTask(); addTask(); addTask(); }
+  if (had) $("saved").textContent = "Восстановлен сохранённый черновик.";
+  renumber();
+
+  form.addEventListener("input", saveDraft);
+  form.addEventListener("change", saveDraft);
+
+  // Подсветка обязательного поля снимается, как только его начали заполнять:
+  // иначе заполненное поле остаётся красным до следующей отправки и выглядит сломанным.
+  const unmark = (e) => { if (e.target && e.target.classList) e.target.classList.remove("bad"); };
+  form.addEventListener("input", unmark);
+  form.addEventListener("change", unmark);
+</script>
+
+</body>
+</html>
