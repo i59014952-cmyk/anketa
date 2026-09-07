@@ -215,7 +215,8 @@
     <p class="lede">
       Нужно понять, из каких задач складывается ваш день и в каких программах вы работаете.
       Это не оценка работы и не проверка — по ответам мы ищем места, где рутину можно снять
-      с человека. Заполнение занимает 7–10 минут, черновик сохраняется сам.
+      с человека. Мы разберём ваши задачи и пришлём подборку кейсов: как такие же задачи
+      решают с ИИ-ассистентом. Заполнение занимает 7–10 минут, черновик сохраняется сам.
     </p>
     <div class="meta">
       <span class="chip">Организация: <b id="chip-org">—</b></span>
@@ -293,8 +294,16 @@
         <div class="field">
           <label for="email">Рабочая почта</label>
           <input type="email" id="email" name="email" autocomplete="email" placeholder="ivanov@company.ru" />
-          <p class="hint">Не обязательно. Нужна, только если по вашим ответам понадобится уточнение.</p>
+          <p class="hint">Не обязательно.</p>
         </div>
+      </div>
+      <div class="field">
+        <label for="contact">Телефон или ник в Telegram <span class="req">*</span></label>
+        <input type="text" id="contact" name="contact" placeholder="+7 900 000-00-00 или @nickname" />
+        <p class="hint">
+          Сюда пришлём разбор ваших задач и кейсы под них — готовые примеры, как эти же
+          задачи решают с ИИ-ассистентом. И напишем, если по анкете понадобится уточнение.
+        </p>
       </div>
     </section>
 
@@ -549,7 +558,7 @@
     return {
       submittedAt: new Date().toLocaleString("ru-RU"),
       name: val("name"), position: val("position"), org: val("org"), dept: val("dept"),
-      exp: val("exp"), email: val("email"),
+      exp: val("exp"), email: val("email"), contact: val("contact"),
       duties: val("duties"), flow: val("flow"),
       apps: [...document.querySelectorAll('#apps input:checked')].map((c) => c.value).join(", "),
       apps_other: val("apps_other"), apps_pain: val("apps_pain"),
@@ -567,7 +576,8 @@
   function validate(d) {
     document.querySelectorAll(".bad").forEach((el) => el.classList.remove("bad"));
     const miss = [];
-    const need = { name: "ФИО", position: "должность", org: "организацию", duties: "обязанности", heavy: "что отнимает время" };
+    const need = { name: "ФИО", position: "должность", org: "организацию", contact: "телефон или ник в Telegram",
+                   duties: "обязанности", heavy: "что отнимает время" };
     for (const k in need) if (!d[k]) { miss.push(need[k]); $(k).classList.add("bad"); }
     if (!d.tasks.length) miss.push("хотя бы одну задачу");
     if (!$("consent").checked) miss.push("согласие внизу");
@@ -597,7 +607,7 @@
     let d = null;
     try { d = JSON.parse(localStorage.getItem(DRAFT) || "null"); } catch (e) {}
     if (!d) return false;
-    ["name", "position", "org", "dept", "exp", "email", "duties", "flow",
+    ["name", "position", "org", "dept", "exp", "email", "contact", "duties", "flow",
      "apps_other", "apps_pain", "heavy", "manual", "delegate", "comment"].forEach((k) => {
       if ($(k) && d[k]) $(k).value = d[k];
     });
@@ -628,7 +638,7 @@
       "<h2>Анкета: задачи и программы сотрудника</h2>" +
       row("Заполнено", d.submittedAt) + row("ФИО", d.name) + row("Должность", d.position) +
       row("Организация", d.org) + row("Подразделение", d.dept) + row("Стаж в должности", d.exp) +
-      row("Почта", d.email) + row("Обязанности", d.duties) + row("Постановка и результат", d.flow) +
+      row("Почта", d.email) + row("Телефон / Telegram", d.contact) + row("Обязанности", d.duties) + row("Постановка и результат", d.flow) +
       "<h3>Задачи</h3>" + t +
       "<h3>Программы</h3>" + row("Отмечено", d.apps) + row("Прочее", d.apps_other) + row("Ручной перенос данных", d.apps_pain) +
       "<h3>Что съедает время</h3>" + row("Больше всего времени", d.heavy) + row("Делается руками", d.manual) +
@@ -675,7 +685,8 @@
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
       try { localStorage.removeItem(DRAFT); } catch (err) {}
-      finish("Спасибо. Вы описали задач: " + d.tasks.length + ". Ответы ушли в общую таблицу.");
+      finish("Спасибо. Вы описали задач: " + d.tasks.length +
+             ". Мы их разберём и пришлём кейсы под ваши задачи — на " + d.contact + ".");
     } catch (err) {
       save(new Blob(["﻿" + asDoc(d)], { type: "application/msword" }), stamp(d) + ".doc");
       say("Связь с сервером не удалась (" + err.message + "), поэтому анкета сохранена файлом Word — пришлите его в рабочую группу.", "err");
