@@ -508,8 +508,8 @@
         "</div>" +
       "</div>" +
       '<div class="field">' +
-        '<label for="t' + i + '-pain">Что в ней самое муторное</label>' +
-        '<textarea id="t' + i + '-pain" class="short" data-k="pain" placeholder="Например: собрать данные из четырёх источников и свести вручную."></textarea>' +
+        '<label for="t' + i + '-pain">Наиболее трудоёмкая часть задачи</label>' +
+        '<textarea id="t' + i + '-pain" class="short" data-k="pain" placeholder="Например: сбор данных из четырёх источников и сведение вручную."></textarea>' +
       "</div>";
 
     list.appendChild(box);
@@ -636,7 +636,7 @@
       "<p><b>Задача " + (n + 1) + ".</b> " + esc(x.what) + "<br>" +
       "Частота: " + esc(x.freqLabel) + " · Длительность: " + esc(x.durLabel) + "<br>" +
       "Программы: " + esc(x.apps) + " · Результат: " + esc(x.out) +
-      (x.pain ? "<br>Муторно: " + esc(x.pain) : "") + "</p>"
+      (x.pain ? "<br>Трудоёмкая часть: " + esc(x.pain) : "") + "</p>"
     ).join("");
     return "<html><head><meta charset='utf-8'></head><body>" +
       "<h2>Анкета: задачи и программы сотрудника</h2>" +
