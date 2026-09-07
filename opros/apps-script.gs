@@ -1,19 +1,15 @@
-// Приём анкет «Задачи и программы сотрудника» в Google-таблицу.
+// Приём анкет «Анкета рабочих задач» в Google-таблицу.
 //
-// Куда вставлять: таблица → Расширения → Apps Script → заменить весь Код.gs этим файлом.
-// Затем «Начать развёртывание → Новое развёртывание», тип «Веб-приложение»,
-// запуск от имени «Я», доступ «Все», и полученный URL вписать в index.html
-// в строку const ENDPOINT = "...".
+// Куда вставлять: таблица → Extensions → Apps Script → заменить весь Code.gs этим файлом.
+// Затем Deploy → Manage deployments → карандаш → Version: New version → Deploy.
+// Без обновления версии по ссылке продолжит работать прежний код.
 //
-// Пишется ДВА листа:
-//   «Сотрудники» — одна строка на анкету, ЦЕЛИКОМ: кто, обязанности, программы,
-//                  затраты времени и все задачи списком в последней ячейке;
-//   «Задачи»     — одна строка на задачу, с оценкой часов в месяц.
-// Задачи продублированы намеренно: строкой сотрудника анкету читают глазами,
-// а листом «Задачи» её сортируют по нагрузке. Источник у обоих один и тот же
-// массив tasks, поэтому разойтись они не могут.
+// Пишется ОДИН лист «Анкеты»: одна строка — одна анкета целиком, включая все
+// задачи человека списком в последней ячейке. Отдельного листа задач нет
+// намеренно: заказчик читает таблицу глазами, и разложенные по двум вкладкам
+// ответы выглядели как потерянные.
 
-const PEOPLE = [
+const COLUMNS = [
   ['submittedAt', 'Заполнено'],
   ['name',        'ФИО'],
   ['position',    'Должность'],
@@ -22,29 +18,22 @@ const PEOPLE = [
   ['exp',         'Стаж в должности'],
   ['email',       'Почта'],
   ['contact',     'Телефон / Telegram'],
-  ['duties',      'Обязанности'],
+  ['duties',      'Зона ответственности'],
   ['flow',        'Кто ставит задачи / кому результат'],
   ['apps',        'Программы (отмеченные)'],
   ['apps_other',  'Программы (прочие)'],
   ['apps_pain',   'Ручной перенос данных'],
-  ['heavy',       'Отнимает больше всего времени'],
-  ['manual',      'Делается руками, хотя повторяется'],
-  ['delegate',    'Отдал бы помощнику'],
+  ['heavy',       'Наиболее трудоёмкие задачи'],
+  ['manual',      'Выполняется вручную'],
+  ['delegate',    'Передал бы помощнику'],
   ['comment',     'Дополнительно'],
 ];
 
-// Две колонки в конце строки сотрудника: сколько задач и все они текстом.
-const PEOPLE_TAIL = ['Задач указано', 'Задачи (списком)'];
+// Три колонки в конце строки: сколько задач, суммарная нагрузка и сами задачи.
+const TAIL = ['Задач указано', 'Часов в месяц (оценка)', 'Задачи (списком)'];
 
-const TASKS = [
-  'Заполнено', 'ФИО', 'Должность', 'Организация', 'Подразделение',
-  '№', 'Задача', 'Как часто', 'Сколько занимает раз',
-  'Программы', 'Результат', 'Наиболее трудоёмкая часть', '≈ часов в месяц',
-];
-
-// Оценка нагрузки. Коэффициенты живут ТОЛЬКО здесь — на странице анкеты их нет,
-// иначе две оценки одной задачи разъехались бы. Это прикидка, а не замер:
-// частота × длительность, обе взяты по нижней границе диапазона.
+// Оценка нагрузки: частота × длительность, обе по нижней границе диапазона.
+// Коэффициенты живут только здесь — на странице анкеты их нет.
 const PER_MONTH = {
   day_many: 42,    // ~2 раза в день × 21 рабочий день
   day: 21,
@@ -69,31 +58,12 @@ function doPost(e) {
 
   try {
     const d = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-
     const tasks = d.tasks || [];
+    const sh = sheet(COLUMNS.map(function (c) { return c[1]; }).concat(TAIL));
 
-    // --- лист «Сотрудники» ---
-    const people = sheet(ss, 'Сотрудники',
-      PEOPLE.map(function (c) { return c[1]; }).concat(PEOPLE_TAIL));
-    people.appendRow(
-      PEOPLE.map(function (c) { return d[c[0]] || ''; })
-            .concat([tasks.length, summary(tasks)]));
-
-    // --- лист «Задачи» ---
-    if (tasks.length) {
-      const sh = sheet(ss, 'Задачи', TASKS);
-      const rows = tasks.map(function (t, i) {
-        const load = hours(t);
-        return [
-          d.submittedAt || '', d.name || '', d.position || '', d.org || '', d.dept || '',
-          i + 1, t.what || '', t.freqLabel || '', t.durLabel || '',
-          t.apps || '', t.out || '', t.pain || '',
-          load,
-        ];
-      });
-      sh.getRange(sh.getLastRow() + 1, 1, rows.length, TASKS.length).setValues(rows);
-    }
+    sh.appendRow(
+      COLUMNS.map(function (c) { return d[c[0]] || ''; })
+             .concat([tasks.length, total(tasks), summary(tasks)]));
 
     return json({ ok: true, tasks: tasks.length });
   } catch (err) {
@@ -103,32 +73,38 @@ function doPost(e) {
   }
 }
 
-// Оценка нагрузки одной задачи. Считается в одном месте: и для листа «Задачи»,
-// и для сводки в строке сотрудника — иначе одна задача получила бы два числа.
+// Нагрузка одной задачи в часах за месяц.
 function hours(t) {
   const load = (PER_MONTH[t.freq] || 0) * (HOURS[t.dur] || 0);
-  return load ? Math.round(load * 10) / 10 : '';
+  return load ? Math.round(load * 10) / 10 : 0;
 }
 
-// Все задачи человека одной ячейкой — чтобы анкету можно было прочитать
-// целиком, не переходя на второй лист.
+// Сумма по всем задачам — число, а не текст: по этой колонке сортируют.
+function total(tasks) {
+  let sum = 0;
+  tasks.forEach(function (t) { sum += hours(t); });
+  return sum ? Math.round(sum * 10) / 10 : '';
+}
+
+// Все задачи одной ячейкой, по строке на задачу.
 function summary(tasks) {
   return tasks.map(function (t, i) {
     const h = hours(t);
     return (i + 1) + '. ' + (t.what || 'без названия') +
-      ' — ' + (t.freqLabel || 'периодичность не указана') +
-      ', ' + (t.durLabel || 'длительность не указана') +
-      (t.apps ? ', программы: ' + t.apps : '') +
-      (t.out ? ', результат: ' + t.out : '') +
-      (h ? ', ≈' + String(h).replace('.', ',') + ' ч/мес' : '') +
-      (t.pain ? '. Трудоёмкая часть: ' + t.pain : '');
+      ' | периодичность: ' + (t.freqLabel || 'не указана') +
+      ' | длительность: ' + (t.durLabel || 'не указана') +
+      (t.apps ? ' | программы: ' + t.apps : '') +
+      (t.out ? ' | результат: ' + t.out : '') +
+      (h ? ' | около ' + h + ' ч в месяц' : '') +
+      (t.pain ? ' | трудоёмкая часть: ' + t.pain : '');
   }).join('\n');
 }
 
-// Лист по имени: создаётся при первой анкете вместе с шапкой.
-function sheet(ss, name, header) {
-  let sh = ss.getSheetByName(name);
-  if (!sh) sh = ss.insertSheet(name);
+// Лист «Анкеты»: создаётся при первой анкете вместе с шапкой.
+function sheet(header) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName('Анкеты');
+  if (!sh) sh = ss.insertSheet('Анкеты');
   if (sh.getLastRow() === 0) {
     sh.appendRow(header);
     sh.getRange(1, 1, 1, header.length).setFontWeight('bold');
@@ -137,25 +113,23 @@ function sheet(ss, name, header) {
   return sh;
 }
 
-// Самопроверка. Запускается прямо в редакторе: выбрать функцию test в списке
-// наверху и нажать «Выполнить». В таблицу ляжет строка «Проверка связи» и одна
-// тестовая задача. Если строки появились — код и права в порядке, остаётся
-// только развернуть веб-приложение. Строки потом удалите руками.
+// Самопроверка. Выбрать функцию test в списке наверху и нажать Run:
+// в лист ляжет строка «Проверка связи». Заодно видно, не поехала ли
+// кириллица при вставке кода — в шапке должны быть читаемые слова.
 function test() {
   const demo = {
     submittedAt: new Date().toLocaleString('ru-RU'),
     name: 'Проверка связи', position: 'Тест', org: 'Тест', dept: 'Тест',
     exp: '1–3 года', email: 'test@test.ru', contact: '@test',
     duties: 'Тестовая строка, её можно удалить.',
-    flow: '', apps: 'Excel / Google Таблицы, 1С', apps_other: '', apps_pain: '',
+    flow: '', apps: 'Excel, 1С', apps_other: '', apps_pain: '',
     heavy: 'Тестовая строка, её можно удалить.', manual: '', delegate: '', comment: '',
     tasks: [{
       what: 'Тестовая задача', freq: 'day', freqLabel: 'Каждый день',
       dur: 'm60', durLabel: '30–60 минут', apps: '1С', out: 'Документ', pain: '',
     }],
   };
-  const res = doPost({ postData: { contents: JSON.stringify(demo) } });
-  Logger.log(res.getContent());
+  Logger.log(doPost({ postData: { contents: JSON.stringify(demo) } }).getContent());
 }
 
 function doGet() {
