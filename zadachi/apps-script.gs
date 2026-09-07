@@ -106,6 +106,27 @@ function sheet(ss, name, header) {
   return sh;
 }
 
+// Самопроверка. Запускается прямо в редакторе: выбрать функцию test в списке
+// наверху и нажать «Выполнить». В таблицу ляжет строка «Проверка связи» и одна
+// тестовая задача. Если строки появились — код и права в порядке, остаётся
+// только развернуть веб-приложение. Строки потом удалите руками.
+function test() {
+  const demo = {
+    submittedAt: new Date().toLocaleString('ru-RU'),
+    name: 'Проверка связи', position: 'Тест', org: 'Тест', dept: 'Тест',
+    exp: '1–3 года', email: 'test@test.ru', contact: '@test',
+    duties: 'Тестовая строка, её можно удалить.',
+    flow: '', apps: 'Excel / Google Таблицы, 1С', apps_other: '', apps_pain: '',
+    heavy: 'Тестовая строка, её можно удалить.', manual: '', delegate: '', comment: '',
+    tasks: [{
+      what: 'Тестовая задача', freq: 'day', freqLabel: 'Каждый день',
+      dur: 'm60', durLabel: '30–60 минут', apps: '1С', out: 'Документ', pain: '',
+    }],
+  };
+  const res = doPost({ postData: { contents: JSON.stringify(demo) } });
+  Logger.log(res.getContent());
+}
+
 function doGet() {
   return json({ ok: true, service: 'employee-tasks' });
 }
