@@ -415,7 +415,7 @@
 
   <section class="done" id="done">
     <h2>Анкета отправлена</h2>
-    <p id="done-text">Спасибо. Ответы ушли в общую таблицу.</p>
+    <p id="done-text">Спасибо. Мы проанализируем ответы, подготовим кейсы под ваши задачи и свяжемся с вами.</p>
     <div class="actions">
       <button type="button" class="btn-ghost" id="again">Заполнить ещё одну</button>
     </div>
@@ -692,7 +692,8 @@
       if (!res.ok) throw new Error("HTTP " + res.status);
       try { localStorage.removeItem(DRAFT); } catch (err) {}
       finish("Спасибо. Вы описали задач: " + d.tasks.length +
-             ". Мы их разберём и пришлём кейсы под ваши задачи — на " + d.contact + ".");
+             ". Мы проанализируем ответы, подготовим кейсы под ваши задачи и свяжемся с вами — " +
+             d.contact + ".");
     } catch (err) {
       save(new Blob(["﻿" + asDoc(d)], { type: "application/msword" }), stamp(d) + ".doc");
       say("Связь с сервером не удалась (" + err.message + "), поэтому анкета сохранена файлом Word — пришлите его в рабочую группу.", "err");
