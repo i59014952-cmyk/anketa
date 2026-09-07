@@ -6,10 +6,12 @@
 // в строку const ENDPOINT = "...".
 //
 // Пишется ДВА листа:
-//   «Сотрудники» — одна строка на анкету (кто, обязанности, программы, боли);
+//   «Сотрудники» — одна строка на анкету, ЦЕЛИКОМ: кто, обязанности, программы,
+//                  затраты времени и все задачи списком в последней ячейке;
 //   «Задачи»     — одна строка на задачу, с оценкой часов в месяц.
-// Задачи отдельным листом, потому что их у человека много: так их можно
-// отсортировать по часам и сравнить между людьми, не разбирая ячейку с текстом.
+// Задачи продублированы намеренно: строкой сотрудника анкету читают глазами,
+// а листом «Задачи» её сортируют по нагрузке. Источник у обоих один и тот же
+// массив tasks, поэтому разойтись они не могут.
 
 const PEOPLE = [
   ['submittedAt', 'Заполнено'],
@@ -30,6 +32,9 @@ const PEOPLE = [
   ['delegate',    'Отдал бы помощнику'],
   ['comment',     'Дополнительно'],
 ];
+
+// Две колонки в конце строки сотрудника: сколько задач и все они текстом.
+const PEOPLE_TAIL = ['Задач указано', 'Задачи (списком)'];
 
 const TASKS = [
   'Заполнено', 'ФИО', 'Должность', 'Организация', 'Подразделение',
@@ -66,21 +71,25 @@ function doPost(e) {
     const d = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
+    const tasks = d.tasks || [];
+
     // --- лист «Сотрудники» ---
-    const people = sheet(ss, 'Сотрудники', PEOPLE.map(function (c) { return c[1]; }));
-    people.appendRow(PEOPLE.map(function (c) { return d[c[0]] || ''; }));
+    const people = sheet(ss, 'Сотрудники',
+      PEOPLE.map(function (c) { return c[1]; }).concat(PEOPLE_TAIL));
+    people.appendRow(
+      PEOPLE.map(function (c) { return d[c[0]] || ''; })
+            .concat([tasks.length, summary(tasks)]));
 
     // --- лист «Задачи» ---
-    const tasks = d.tasks || [];
     if (tasks.length) {
       const sh = sheet(ss, 'Задачи', TASKS);
       const rows = tasks.map(function (t, i) {
-        const load = (PER_MONTH[t.freq] || 0) * (HOURS[t.dur] || 0);
+        const load = hours(t);
         return [
           d.submittedAt || '', d.name || '', d.position || '', d.org || '', d.dept || '',
           i + 1, t.what || '', t.freqLabel || '', t.durLabel || '',
           t.apps || '', t.out || '', t.pain || '',
-          load ? Math.round(load * 10) / 10 : '',
+          load,
         ];
       });
       sh.getRange(sh.getLastRow() + 1, 1, rows.length, TASKS.length).setValues(rows);
@@ -92,6 +101,28 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+// Оценка нагрузки одной задачи. Считается в одном месте: и для листа «Задачи»,
+// и для сводки в строке сотрудника — иначе одна задача получила бы два числа.
+function hours(t) {
+  const load = (PER_MONTH[t.freq] || 0) * (HOURS[t.dur] || 0);
+  return load ? Math.round(load * 10) / 10 : '';
+}
+
+// Все задачи человека одной ячейкой — чтобы анкету можно было прочитать
+// целиком, не переходя на второй лист.
+function summary(tasks) {
+  return tasks.map(function (t, i) {
+    const h = hours(t);
+    return (i + 1) + '. ' + (t.what || 'без названия') +
+      ' — ' + (t.freqLabel || 'периодичность не указана') +
+      ', ' + (t.durLabel || 'длительность не указана') +
+      (t.apps ? ', программы: ' + t.apps : '') +
+      (t.out ? ', результат: ' + t.out : '') +
+      (h ? ', ≈' + String(h).replace('.', ',') + ' ч/мес' : '') +
+      (t.pain ? '. Трудоёмкая часть: ' + t.pain : '');
+  }).join('\n');
 }
 
 // Лист по имени: создаётся при первой анкете вместе с шапкой.
